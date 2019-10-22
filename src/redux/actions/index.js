@@ -104,3 +104,9 @@ export const handleOnTimerExpire = () => {
     type: actionTypes.HANDLE_ON_TIMER_EXPIRE
   };
 };
+export const getPosts=(data)=>{
+  return{
+    type:actionTypes.GET_POSTS,
+    payload:{data}
+  };
+};

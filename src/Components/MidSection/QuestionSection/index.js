@@ -11,36 +11,49 @@ import { withRouter } from "react-router-dom";
 import Dialogbox from "../../Dialogbox";
 import Icon from "@material-ui/core/Icon";
 import AnswerList from "../AnswerList";
-import {
-  handleOnOption,
-  handleOnOptioncapture,
-  handleOnClickSubmit
-} from "../../../redux/actions";
-
+import {handleOnOption,handleOnOptioncapture,handleOnClickSubmit} from "../../../redux/actions";
 import axios from "axios";
 
 class QuestionSection extends React.Component {
   state = {
-    questions: [],
-    options: [],
+    answerList: [ ],
+    questionAnswer :{
+      questionId : "",
+      answer : "",
+      q_index: 0
+    },
     index: 0,
-    open1: false,
     disabled1: true,
     disabled4: false,
-    disabled6: true,
-    q_lis: [],
-    user_answer: [],
-    u_ans:'',
-    flag: false
+    disabled6: true
   };
+  handle_Change_Answer = e => {
+       const {  index ,user_answer,c_answer,u_ans, questionAnswer} = this.state;
+       const {answerList}=this.props;
+       const { questions } = this.props;
+       var {value}=questions;
+       const {q_index} = questionAnswer;
+       console.log(index,"current");
+       debugger
+       questionAnswer.questionId=questions[this.state.index].q_uuid;
+       questionAnswer.answer = e;
+   debugger
+       answerList[index] = questionAnswer;
+       this.setState({
+         ...this.state,
+         questionAnswer:{
+           q_index : q_index+1
+         },
+           value: e
+       });
+       console.log(answerList,"answers");
+       debugger
 
+     };
   handleOnClickNext = e => {
     let { index, disabled1, disabled4, disabled6 } = this.state;
     let { questions } = this.props;
-    console.log(index, "ttt");
-    const baseURL = "http://localhost:8080/api";
-    debugger;
-
+    console.log(index, "nextIndex");
     if (index < questions.length - 1) {
       if (index === this.props.questions.length - 2) {
         this.setState({
@@ -48,7 +61,6 @@ class QuestionSection extends React.Component {
           disabled6: false
         });
       }
-
       this.setState({
         index: index + 1,
         disabled1: false
@@ -79,23 +91,37 @@ class QuestionSection extends React.Component {
       index: index - 1
     });
   };
+  handleOnClickSubmit=()=>{
+    debugger
+    var { open } = this.state;
+    open=true;
+    debugger
+    this.setState({
+      open
+    })
+    debugger
+    axios.post("http://localhost:8080/api/candidate_answer",{answerList:this.state.answerList}).then(response => {
+      console.log(response, "candi");
+    });
+    axios.get("http://localhost:8080/api/result").then(response => {
+      console.log(response, "candi");
+    });
 
+debugger
+  }
   render() {
-    console.log(this.props.questions, "props");
-
-    debugger;
     const {
-      questions = [],
-      handleOnOption,
-      handleOnOptioncapture,
-      handleOnClickSubmit
+      questions = [],handleOnClickSubmit,open,answerList
     } = this.props;
+console.log(questions,"q");
+    const {
+      disabled1,
+      disabled4,
+      disabled6,
+      index,questionAnswer
+    } = this.state;
 
-    const { disabled1, disabled4, disabled6, index, q_lis } = this.state;
-    let { user_answer ,u_ans} = this.state;
-    console.log("task-list", user_answer);
-    console.log(u_ans,"user_answer");
-
+    let { user_answer, u_ans } = this.state;
     const postAnswer = e => {
       const baseURL = "http://localhost:8080/api/";
       debugger;
@@ -107,76 +133,75 @@ class QuestionSection extends React.Component {
         let question = questions.map(q => q.q_uuid);
         console.log(question, "question");
         console.log(question[index], "q_index");
-        debugger
-        user_answer.forEach(us => {
-          if(question[index] === us){
-        this.state.flag=true;
-        this.setState({
-          flag: true,
-          u_ans:e
-        })
-        console.log(user_answer,"ans");
-      }
-    })
-  if(this.state.flag){
-    this.setState({
-      flag: false
-    })
-      return axios
-              .put(baseURL + "/" + "candidate_answer",{
-                question_id: questions[index].q_uuid,
-                c_answer: this.state.u_ans
-              })
-              .then(response => {
-                let res = response;
-                console.log(res, "user_response");
-              });
-            console.log("put method");
-        }else{
-          console.log(u_ans,"user_a");
-          return axios
-              .post(baseURL + "/" + "candidate_answer", {
-                question_id: questions[index].q_uuid,
-                user_id:"GWL123",
-                c_answer: this.state.u_ans
-              })
-              .then(response => {
-                let res = response;
-                console.log(res, "user_response");
-              });
-        }
-});
-          debugger;
-        }
-
-    console.log(index, "current_index");
-    const q_List = questions.length ? (
-      questions.map((q, index) => {
-        // console.log(this.props.questions[index].q_name, "index")
-        console.log(index, "i");
         debugger;
-        return (
-          <Card key={index + 1} classes={{ root: "questionsectionstyle" }}>
-            <ul>
-              {index + 1}
-              {"."} {questions[index].q_name}
-              <RadioGroup
-                key={index + 1}
-                onChange={e => {
-                  postAnswer(e.target.value);
-                }}
-                value={this.state.u_ans}
-              >
-                {q.options.map((o, index) => (
-                  <FormControlLabel
-                    value={o}
-                    control={<Radio />}
-                    label={o}
-                    style={{ display: "inline-block" }}
-                  />
-                ))}
-              </RadioGroup>
-            </ul>
+        user_answer.forEach(us => {
+          if (question[index] === us) {
+            this.state.flag = true;
+            this.setState({
+              flag: true,
+              u_ans: e
+            });
+            console.log(user_answer, "ans");
+          }
+        });
+        if (this.state.flag) {
+          this.setState({
+            flag: false
+          });
+          return axios
+            .put(baseURL + "/" + "candidate_answer", {
+              question_id: questions[index].q_uuid,
+              c_answer: this.state.u_ans
+            })
+            .then(response => {
+              let res = response;
+              console.log(res, "user_response");
+            });
+          console.log("put method");
+        } else {
+          console.log(u_ans, "user_a");
+          return axios
+            .post(baseURL + "/" + "candidate_answer", {
+              question_id: questions[index].q_uuid,
+              user_id: "GWL123",
+              c_answer: this.state.u_ans
+            })
+            .then(response => {
+              let res = response;
+              console.log(res, "user_response");
+            });
+        }
+      });
+      debugger;
+    };
+    const q_List = questions.length ? (
+      questions.map((q, key) => {
+        const val =this.props.answerList[key]&& this.props.answerList[key].answer;
+        debugger;
+return (
+          <Card key={key + 1} classes={{ root: "questionsectionstyle" }}>
+          <ul>
+            {key + 1}
+            {"."} {questions[key].q_name}
+            <RadioGroup
+              key={key + 1}
+              onChange={e => {
+                this.handle_Change_Answer(e.target.value);
+              }}
+              value={val}
+            >
+              {q.options.map((o, key) => (
+                <FormControlLabel
+                  value={o}
+                  control={<Radio />}
+                  label={o}
+                  style={{ display: "inline-block" }}
+                />
+
+              )
+            )}
+            </RadioGroup>
+</ul>
           </Card>
         );
       })
@@ -184,9 +209,8 @@ class QuestionSection extends React.Component {
       <div>no questions</div>
     );
 
-
     return (
-      <div>
+      <React.Fragment>
         {q_List[this.state.index]}
         <br />
         <Grid container>
@@ -213,26 +237,27 @@ class QuestionSection extends React.Component {
             </Button>
           </Grid>
           <Grid item md={1}>
-            <Dialogbox text={this.state.text} />
+            <Dialogbox text={this.state.text} open={this.props.open} handleOnClose={this.props.handleOnClose}  />
             <Button
               color="primary"
               variant="contained"
               classes={{ root: "submitstyle" }}
               disabled={disabled6}
-              onClick={handleOnClickSubmit}
+              onClick={this.props.handleOnClickSubmit}
             >
               Submit
             </Button>
           </Grid>
         </Grid>
-      </div>
+      </React.Fragment>
     );
   }
 }
 
-const mapStateToProps = ({ q_List }) => {
+const mapStateToProps = ({ q_lists }) => {
+  console.log(q_lists, "redux");
   return {
-    q_List
+    q_lists
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -242,13 +267,7 @@ const mapDispatchToProps = dispatch => {
     },
     handleOnOptioncapture: () => {
       dispatch(handleOnOptioncapture());
-    },
-    handleOnClickSubmit: () => {
-      dispatch(handleOnClickSubmit());
     }
   };
 };
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withRouter(QuestionSection));
+export default connect(mapStateToProps,mapDispatchToProps)(withRouter(QuestionSection));

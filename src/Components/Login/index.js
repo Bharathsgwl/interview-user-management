@@ -25,24 +25,22 @@ const Login = props => {
     <React.Fragment>
       <AppBar position="static" style={{ background: "#009688" }}>
         <Toolbar>
-          <Grid item md={12}>
             <Typography
               style={{ fontFamily: '"Apple Color Emoji"' }}
               variant="h5"
             >
               GoodWorks Colloquio
             </Typography>
-          </Grid>
         </Toolbar>
       </AppBar>
       <Grid container style={{ marginTop: 10 }}>
-        <Hidden xsDown>
+
           <Grid
             item
             md={7}
             style={{ background: "#009688", height: "578px", width: "50000px" }}
           ></Grid>
-        </Hidden>
+      
         <Grid item md={5} classes={{ root: "displaying"}}>
           <Card classes={{ root: "card" }}>
             <CardContent>

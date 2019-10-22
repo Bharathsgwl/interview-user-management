@@ -10,7 +10,7 @@ import {
 import ExamSection from "../ExamSection";
 import Header from "../../Header";
 import { connect } from "react-redux";
-import { handleOnChange, onClickStart } from "../../../redux/actions";
+import { handleOnChange, onClickStart,getPosts } from "../../../redux/actions";
 import { withRouter } from "react-router-dom";
 import CardHeader from "@material-ui/core/CardHeader";
 import {
@@ -29,7 +29,7 @@ class  InstructionsPage extends React.Component{
     examRule:[]
   }
   componentDidMount(){
-     axios.get("http://localhost:8080/api/exam_rules").then(response=>{
+     axios.get("https://tranquil-wildwood-09825.herokuapp.com/api/exam_rules").then(response=>{
        console.log(response.data,"abcv");
        this.setRules(response.data.posts);
      }).catch(err=>{console.log(err)})
@@ -38,6 +38,11 @@ class  InstructionsPage extends React.Component{
      this.setState({examRule})
      console.log(examRule);
    }
+  // componentDidMount(){
+  //   debugger
+  //   this.props.getPosts();
+  //   debugger
+  // }
 
 // setTasks = taskList => {
 //   this.setState({ taskList });
@@ -47,10 +52,13 @@ class  InstructionsPage extends React.Component{
   render(){
     const {examRule}= this.state;
   console.log(this.props,"instructions");
-  const { rule, handleOnChange, disabled, history, onClickStart } = this.props;
+  const { rule, handleOnChange, disabled, history, onClickStart,fetchPosts,data } = this.props;
+  var {rules}=this.props;
+rules=examRule;
+  console.log(rules,"rule");
 //   console.log(this.state.taskList[0],"rur=le");
 // console.log(this.state.taskList.map(task=> task.rule_name),"dhd");
-console.log(examRule,"rule");
+console.log(data,"rule");
   return (
     <Grid justify content="center">
       <Grid item md={12}>
@@ -65,17 +73,14 @@ console.log(examRule,"rule");
           </Toolbar>
         </AppBar>
       </Grid>
-      <br></br>
-      <br></br>
-      <br></br>
-      <Grid container justify="center">
-        <Grid item md={6}>
+        <Grid item md={6} style={{margin:"auto"}}>
           <h1
             style={{
               textAlign: "center",
               fontFamily: "initial",
               color: "#009688",
-              paddingTop: "50px"
+              paddingTop: "50px",
+                  margin: "auto"
             }}
           >
             Instructions
@@ -97,13 +102,9 @@ console.log(examRule,"rule");
              )
            })
          }
-
           </Card>
         </Grid>
-        <br />
-        <br />
-        <br />
-        <br />
+
         <Grid item md={12} style={{ textAlign: "center" }}>
           <Checkbox
             style={{ color: "#009688" }}
@@ -113,7 +114,7 @@ console.log(examRule,"rule");
           />
         Agree and Continue,
         </Grid>
-        <Grid item md={1}>
+        <Grid item md={12} style={{ textAlign: "center" }}>
           <Button
             variant="contained"
             color="primary"
@@ -125,15 +126,16 @@ console.log(examRule,"rule");
             Start
           </Button>
         </Grid>
-      </Grid>
+
     </Grid>
   );
 }
 };
-const mapStateToProps = ({ disabled, rule }) => {
+const mapStateToProps = ({ disabled, rule,rules }) => {
+  console.log(rules,"mapStateToProps");
   return {
     disabled,
-    rule
+    rule,rules
   };
 };
 const mapDispatchToProps = dispatch => {
@@ -141,7 +143,6 @@ const mapDispatchToProps = dispatch => {
     handleOnChange: (property, value) => {
       dispatch(handleOnChange(property, value));
     },
-    
     onClickStart: history => dispatch(onClickStart(history))
   };
 };

@@ -72,6 +72,10 @@ const applicationIntialState = {
       value: ""
     }
   ],
+  q_lists:[
+    {q_id:{},value:''}
+  ],
+  rules:[],
   length: 2,
   message: "",
   login: {
@@ -209,11 +213,10 @@ const reducer = (state = applicationIntialState, action) => {
       };
     case actionTypes.HANDLE_ON_CLICK_SUBMIT:
       var { open } = state;
-
       open = !open;
-      // axios.get("http://localhost:8080/api/candidate_answer").then(response => {
-      //   console.log(response, "candi");
-      // });
+      axios.post("http://localhost:8080/api/candidate_answer").then(response => {
+        console.log(response, "candi");
+      });
       debugger;
       return {
         ...state,
@@ -253,6 +256,9 @@ const reducer = (state = applicationIntialState, action) => {
     case actionTypes.HANDLE_ON_CLICK_OK:
       var history = action.payload.history;
       debugger;
+      axios.get("https://tranquil-wildwood-09825.herokuapp.com/api/result").then(response => {
+        console.log(response, "candi");
+      });
       history.push("/user/logoutsection");
       return {
         ...state,
@@ -265,6 +271,23 @@ const reducer = (state = applicationIntialState, action) => {
         ...state,
         history
       };
+      case actionTypes.GET_POSTS:
+      var {rules}=state;
+      var {data}=action.payload;
+      debugger
+      axios.get('http://localhost:8080/api/exam_rules').then(response=>{
+        console.log(response.data.posts)
+        data=response.data.posts;
+        console.log(data,"rul");
+          let rules=data;
+          console.log(rules,"data");
+      });
+      debugger
+      console.log(rules);
+      return{
+        ...state,rules
+      }
+      console.log(data,"rules");
 
       debugger;
     default:
